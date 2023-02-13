@@ -76,9 +76,9 @@ public:
 
     SimpleVector& operator=(SimpleVector&& other) noexcept {
         if (this != &other) {
-            size_ = std::exchange(other.size_, 0);
-            capacity_ = std::exchange(other.capacity_, 0);
-            elements_ = std::move(other.elements_);
+        std::swap(size_, other.size_);
+        std::swap(capacity_, other.capacity_);
+        elements_.swap(other.elements_);
         }
         return *this;
     }
@@ -113,8 +113,9 @@ public:
     }
 
     Iterator Insert(ConstIterator position, const Type& value) {
+        assert(position >= begin() && position <= end());
         size_t distance_ = position - elements_.Get();
-        assert(distance_ <= size_);
+        //assert(distance_ <= size_);
         Iterator element_position = elements_.Get() + distance_;
 
         size_t new_size = size_ + 1;
@@ -142,8 +143,9 @@ public:
     }
 
     Iterator Insert(ConstIterator position, Type&& value) {
+        assert(position >= begin() && position <= end());
         size_t distance_ = position - elements_.Get();
-        assert(distance_ <= size_);
+        //assert(distance_ <= size_);
         Iterator element_position = elements_.Get() + distance_;
 
         size_t new_size = size_ + 1;
@@ -169,6 +171,7 @@ public:
     }
 
     Iterator Erase(ConstIterator position) {
+        assert(position >= begin() && position <= end());
         std::move(std::next((Iterator)position), end(), Iterator(position));
         --size_;
 
@@ -203,11 +206,13 @@ public:
 
     // Возвращает ссылку на элемент с индексом index
     Type& operator[](size_t index) noexcept {
+        assert(index < size_);
         return  elements_[index];
     }
 
     // Возвращает константную ссылку на элемент с индексом index
     const Type& operator[](size_t index) const noexcept {
+        assert(index < size_);
         return  elements_[index];
     }
 
@@ -341,3 +346,4 @@ template <typename Type>
 bool operator>=(const SimpleVector<Type>& left, const SimpleVector<Type>& right) {
     return (right < left) || (right == left);
 }
+
